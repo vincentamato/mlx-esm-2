@@ -186,7 +186,7 @@ class ESM2(nn.Module):
             "representations": hidden_representations,
         }
 
-        # Collect attentions and optional contacts
+        # Collect attentions if requested
         if need_head_weights:
             # Stack layers -> (B, L, H, T, T)
             attentions = mx.stack(attn_weights, axis=1)
@@ -199,9 +199,10 @@ class ESM2(nn.Module):
 
             result["attentions"] = attentions
 
-            if return_contacts:
-                contacts = self.contact_head(tokens, attentions)
-                result["contacts"] = contacts
+        # Compute contacts if requested
+        if return_contacts:
+            contacts = self.contact_head(tokens, attentions)
+            result["contacts"] = contacts
 
         return result
 
