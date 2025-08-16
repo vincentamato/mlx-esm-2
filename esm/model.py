@@ -123,14 +123,15 @@ class ESM2(nn.Module):
 
         # Token dropout: zero masked tokens + rescale based on observed mask ratio
         if self.token_dropout:
+            # x.masked_fill_((tokens == self.mask_idx).unsqueeze(-1), 0.0)
             mask_positions = mx.equal(tokens, self.mask_idx)
-            x = mx.where(mask_positions[:, :, None], mx.zeros_like(x), x)
-
+            x = mx.where(mask_positions[:, :, None], 0.0, x)
+            
+            # x: B x T x C
             mask_ratio_train = 0.15 * 0.8
-            src_lengths = mx.sum(~padding_mask, axis=-1, keepdims=True)
-            mask_ratio_observed = mx.sum(mask_positions, axis=-1, keepdims=True) / src_lengths
-            scale_factor = (1 - mask_ratio_train) / mx.maximum(1 - mask_ratio_observed, 1e-8)
-            x = x * scale_factor[:, None, :]
+            src_lengths = mx.sum(~padding_mask, axis=-1)  # Shape: (B,)
+            mask_ratio_observed = mx.sum(mask_positions, axis=-1).astype(x.dtype) / src_lengths  # Shape: (B,)
+            x = x * (1 - mask_ratio_train) / (1 - mask_ratio_observed)[:, None, None]
 
         # Zero out padding positions
         if padding_mask.any():
