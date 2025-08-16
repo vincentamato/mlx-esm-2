@@ -5,7 +5,7 @@ in MLX.[^1] ESM-2 is Meta’s second-generation Evolutionary Scale Model, a
 transformer-based protein language model trained on millions of diverse protein
 sequences with a masked language modeling objective.
 
-![Alt text for the image](assets/contact_prediction.png)
+![Example contact prediction map](assets/contact_prediction.png)
 _Example contact prediction map for a universal stress protein. In this case, ESM-2 achieves 86.4% precision at long-range contacts._
 
 ## Setup
