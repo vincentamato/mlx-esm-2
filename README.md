@@ -1,4 +1,4 @@
-# ESM-2
+# ESM-2 in MLX
 
 This repository provides an implementation of Meta's ESM-2 protein language model
 in MLX.[^1] ESM-2 is Meta’s second-generation Evolutionary Scale Model, a
@@ -6,7 +6,8 @@ transformer-based protein language model trained on millions of diverse protein
 sequences with a masked language modeling objective.
 
 ![Example contact prediction map](assets/contact_prediction.png)
-_Example contact prediction map for a universal stress protein. In this case, ESM-2 achieves 86.4% precision at long-range contacts._
+
+_Example contact prediction map for a universal stress protein. In this case, ESM-2 650M achieves 86.4% precision at long-range contacts._
 
 ## Setup
 
@@ -55,7 +56,7 @@ logits = result["logits"]  # Shape: (batch, length, vocab_size)
 
 ### Masked Language Modeling
 
-```python
+```bash
 # For a complete example, see main.py
 python main.py --sequence "YOUR_SEQUENCE" --mask-position 50
 ```
@@ -77,10 +78,9 @@ final_layer = representations[33]  # Shape: (batch, length, embed_dim)
 # Predict residue-residue contacts
 contacts = model.predict_contacts(tokens)  # Shape: (batch, length, length)
 
-# Or get contacts along with other outputs
-result = model(tokens, return_contacts=True)
-contacts = result["contacts"]
-attentions = result["attentions"]  # Shape: (batch, layers, heads, length, length)
+# Or compute contacts together with logits, representations, etc.
+outputs = model(tokens, return_contacts=True)
+contacts = outputs["contacts"]
 ```
 
 ### Examples
@@ -111,7 +111,7 @@ Benchmark PyTorch MPS performance:
 python benchmarks/benchmark_pt.py
 ```
 
-Expected performance on M4 MacBook Pro (batch_size = 5):
+Expected performance on M4 MacBook Pro (ESM-2 650M, batch_size = 5):
 
 - MLX: 299 ms per step, 16.71 sequences/sec
 - PyTorch MPS: 402 ms per step, 12.43 sequences/sec
@@ -126,7 +126,7 @@ python test.py
 
 This tests tokenizer and model outputs (logits, hidden states, and attentions) for equivalence with the original implementation.
 
-Citations:
+### Citations:
 
 ```bibtex
 @article{rives2019biological,
@@ -141,15 +141,15 @@ Citations:
 ```
 
 ```bibtex
-@article{lin2023evolutionary,
+@article{Lin2023,
+  author={Zeming Lin et al.},
   title={Evolutionary-scale prediction of atomic-level protein structure with a language model},
-  author={Lin, Zeming and Akin, Halil and Rao, Roshan and Hie, Brian and Zhu, Ziheng and Lu, Wenting and Smetanin, Nikita and Verkuil, Robert and Kabeli, Ori and Shmueli, Yilun and dos Santos Costa, Allan and Fazel-Zarandi, Maryam and Sercu, Tom and Candido, Salvatore and Rives, Alexander},
   journal={Science},
   volume={379},
-  number={6637},
   pages={1123--1130},
   year={2023},
-  publisher={American Association for the Advancement of Science}
+  doi={10.1126/science.ade2574},
+  url={https://doi.org/10.1126/science.ade2574}
 }
 ```
 
